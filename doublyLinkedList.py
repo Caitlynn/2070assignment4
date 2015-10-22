@@ -50,7 +50,7 @@ class LinkedList(object):
         if index < 0 or index >= self.size:
             raise IndexError("index is out of range")
         if index == 0:
-            self.root = self.root.next
+            self.root = self.root.get_next()
             self.root.set_prev(None)
         else:
             node = self._getNode(index)
@@ -71,14 +71,16 @@ class LinkedList(object):
                 this_node = this_node.get_next()
         return None
 
-
-myList = LinkedList()
-myList.add(5)
-myList.add(43)
-myList.add(2)
-myList.add(6)
-myList.add(23)
-myList.add(9)
-myList.remove(9)
-print(myList.remove(2))
-print(myList.find(23))
+if __name__ == "__main__":
+    myList = LinkedList()
+    myList.add(0,5)
+    myList.add(1,23)
+    myList.add(2,2)
+    myList.add(3,7)
+    myList.add(4,50)
+    for i in range (myList.size):
+        print(myList._getNode(i).data)
+    print("\n")
+    myList.remove(0)
+    for i in range (myList.size):
+        print(myList._getNode(i).data)
