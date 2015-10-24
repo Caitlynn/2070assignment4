@@ -64,11 +64,13 @@ class LinkedList(object):
 
     def find(self,d):
         this_node = self.root
+        i = 0
         while this_node:
             if this_node.get_data() == d:
-                return d
+                return i
             else:
                 this_node = this_node.get_next()
+                i += 1
         return None
 
 if __name__ == "__main__":
