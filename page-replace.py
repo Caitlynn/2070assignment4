@@ -2,7 +2,6 @@ __author__ = 'Caitlynn'
 import sys
 import pagerefgen
 import doublyLinkedList
-from itertools import cycle
 
 #take the arguments to generate page reference list
 pages = pagerefgen.generate(int(sys.argv[1]),int(sys.argv[2]))
@@ -48,19 +47,80 @@ class lru(doublyLinkedList.LinkedList):
         mypage.add(100,node) #add the node to the end of the frame
         return mypage
 
-if __name__ == "__main__":
-    alg1 = lru(5)
-    alg1.referencePage()
+class Clock():
+    def __init__(self,nframe):
+        self.nframe = nframe
+        self.pagedict = {}  #a dictionary to hold page number and the index of the page number in the list or none if the page is not there
+        self.pointer = 0
+        self.clockList = []
+        self.pagefault = 0
 
-'''
-def clock():
-    pagedict = dict()
-    pagedict[page] = index
-    clockArray = []
-    for index in range (len(pages)):
-        clockArray.append(index)
-    clockArray = cycle(clockArray) #make the list circular
-    for item in clockArray:
-        return
-    return
-'''
+    def referencePages(self):
+        for i in range (self.nframe):
+            self.clockList.append([-1,0]) # append [page,flag]
+
+        for i in range (len(pages)):
+            if self.pointer >= self.nframe:
+                self.pointer = 0
+
+            if self.checkPage(pages[i]) == None: #page is not found
+                self.processPageFault(pages[i])
+            else:
+                index = self.checkPage(pages[i])
+                self.clockList[index][1] = 1
+            print('page reference list: ' + str(pages))
+            print('clock list: ' + str(self.clockList))
+            print('current referecing page: ' + str(pages[i]))
+            print('page fault: ' + str(self.pagefault))
+
+
+    def processPageFault(self, page):
+        self.pagefault += 1
+        if self.list_not_full(): #if the list is not full then add page to the pointer position
+            self.clockList[self.pointer][0] = page
+            self.clockList[self.pointer][1] = 1
+            self.pagedict[page] = self.pointer
+            self.pointer += 1
+
+        elif self.clockList[self.pointer][1] == 0:
+            self.pagedict[self.clockList[self.pointer][0]] = None
+            self.clockList[self.pointer][0] = page
+            self.pagedict[page] = self.pointer
+            self.clockList[self.pointer][1] = 1
+            self.pointer += 1
+
+        elif self.clockList[self.pointer][1] == 1:
+            self.clockList[self.pointer][1] = 0
+            self.pointer += 1
+            self.pagedict[page] = None
+
+            while True:
+                if self.pointer >= len(self.clockList):
+                    self.pointer = 0
+                if self.clockList[self.pointer][1] == 0:
+                    self.pagedict[self.clockList[self.pointer][0]] = None
+                    self.clockList[self.pointer][0] = page
+                    self.pagedict[page] = self.pointer
+                    self.clockList[self.pointer][1] = 1
+                    return
+                elif self.clockList[self.pointer][1] == 1:
+                    self.pointer += 1
+
+    def list_not_full(self):
+        for i in range (len(self.clockList)):
+            if self.clockList[i][0] == -1:
+                return True
+        return False
+
+    def checkPage(self, page):
+        if self.pagedict.get(page):
+            return self.pagedict.get(page)
+        return None
+
+
+if __name__ == "__main__":
+    #alg1 = lru(5)
+    #alg1.referencePage()
+    alg2 = Clock(5)
+    alg2.referencePages()
+
